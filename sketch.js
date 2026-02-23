@@ -1,4 +1,5 @@
 let obj;
+let block;
 let gravity = 0.1;
 
 function setup() {
@@ -11,11 +12,19 @@ function setup() {
     vy: 0,
     dragging: false
   };
+  block = { x: -1100, y: 948, w: 1500, h: 50 };
+  block2 = { x: 700, y: 900, w: 100, h: 50 };
 }
 
 function draw() {
   background(220);
+  fill('lightblue');
+  rect(block.x, block.y, block.w, block.h);
+  
+  fill('grey');
+  rect(block2.x, block2.y, block2.w, block2.h);
 
+  fill('white');
   // Interaction logic
   if (obj.dragging) {
     obj.x = mouseX;
@@ -32,7 +41,7 @@ function draw() {
     if (obj.y > height - obj.r) {
       obj.y = height - obj.r;
       obj.vy *= -0.7; // Bounce
-      obj.vx *= 0.95; // Friction
+      obj.vx *= 1.0; // Friction
     }
     
     // right wall collision
@@ -43,10 +52,10 @@ function draw() {
     }
     
     // left wall collision
-    if (-obj.x > width - obj.r) {
-      obj.x = -width + obj.r;
-      obj.vy *= 0.7; // Bounce
-      obj.vx *= -0.95; // Friction
+    if (-obj.x > width + obj.r) {
+      obj.x = -width - obj.r;
+      obj.vy *= -0.7; // Bounce
+      obj.vx *= 0.0; // Friction
     }
     
     // ceiling collision
@@ -56,9 +65,38 @@ function draw() {
       obj.vx *= -0.50; // Friction
     }
   }
+  
+  if (
+    obj.x > block.x &&
+    obj.x < block.x + block.w &&
+    obj.y > block.y &&
+    obj.y < block.y + block.h
+  ) {
+    spawnBall(); // Respawn!
+  }
+  
+  if (
+    obj.x > block2.x &&
+    obj.x < block2.x + block2.w &&
+    obj.y > block2.y &&
+    obj.y < block2.y + block2.h
+  ) {
+    spawnBall(); // Respawn!
+  }
 
   // Draw object
   ellipse(obj.x, obj.y, obj.r * 2);
+}
+
+function spawnBall() {
+  obj = {
+    x: width / 2,
+    y: height / 2,
+    r: 50,
+    vx: 0,
+    vy: 0,
+    dragging: false
+  };
 }
 
 function mousePressed() {
