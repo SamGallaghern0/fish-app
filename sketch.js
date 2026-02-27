@@ -4,6 +4,7 @@ let gravity = 0.1;
 
 function setup() {
   createCanvas(1000, 1000);
+  colorMode(HSL)
   obj = {
     x: width / 2,
     y: height / 2,
@@ -14,17 +15,23 @@ function setup() {
   };
   block = { x: -1100, y: 948, w: 1500, h: 50 };
   block2 = { x: 700, y: 900, w: 100, h: 50 };
+  
+  bg = new WhiteBg()
+  popup = new Popup(200, 200, 200, 40, CENTER)
 }
 
 function draw() {
-  background(220);
-  fill('lightblue');
+  background('rgb(220,237,243)');
+  
+  bg.draw()
+  popup.draw()
+  fill('rgb(152,203,220)');
   rect(block.x, block.y, block.w, block.h);
   
   fill('grey');
   rect(block2.x, block2.y, block2.w, block2.h);
 
-  fill('white');
+  fill('red');
   // Interaction logic
   if (obj.dragging) {
     obj.x = mouseX;
@@ -73,6 +80,7 @@ function draw() {
     obj.y < block.y + block.h
   ) {
     spawnBall(); // Respawn!
+    popup.toggle()
   }
   
   if (
@@ -82,6 +90,7 @@ function draw() {
     obj.y < block2.y + block2.h
   ) {
     spawnBall(); // Respawn!
+    popup.toggle()
   }
 
   // Draw object
@@ -108,4 +117,75 @@ function mousePressed() {
 
 function mouseReleased() {
   obj.dragging = false;
+}
+
+
+//code taken from Popup by kangabru
+class OnOff {
+  constructor() {
+    this.on = false
+    this._val = 0
+  }
+  
+  get val() { return ease(this._val / 100, 3) }
+  
+  updateOnOff() {
+    const tar = this.on ? 100 : 0
+    this._val += constrain(tar - this._val, -4, 4)
+  }
+}
+
+class Popup extends OnOff {
+  constructor(x, y, w, h, mode) {
+    super()
+    this.x = x
+    this.y = y
+    this.w = w
+    this.h = h
+    this.mode = mode
+  }
+  
+  toggle() {
+    this.on = !this.on
+    bg.on = this.on
+  }
+  
+  draw(drawContent) {
+    this.updateOnOff()
+    const t = this.val
+    push()
+    rectMode(this.mode)
+    translate(this.x, this.y)
+    fill(100, t)
+    stroke(0, t)
+    strokeWeight(2)
+    rectMode(CENTER)
+    rect(250, (1 - t) * 50, 400, 100, 5)
+    textAlign(CENTER)
+    text("this is text", 250, (1 - t) * 50)
+    drawContent?.(t)
+    pop()
+  }
+}
+
+class WhiteBg extends OnOff {
+  constructor() {
+    super()
+  }
+  
+  draw() {
+    this.updateOnOff()
+    fill(100, this.val * 0.4)
+    noStroke()
+    rectMode(CORNER)
+    rect(0, 0, width, height)
+  }
+}
+
+function ease(_p, g=1.75, neg=false) {
+  let p = 1 - abs(1 - _p % 2) // make continuous between 0-1
+  let res = p < 0.5
+    ? 0.5 * pow(2*p, g)
+    : 1 - 0.5 * pow(2*(1 - p), g);
+  return neg ? res * 2 - 1 : res
 }
