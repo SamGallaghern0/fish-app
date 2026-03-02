@@ -1,3 +1,4 @@
+let isVisible = true;
 let obj;
 let block;
 let gravity = 0.1;
@@ -17,7 +18,7 @@ function setup() {
   block2 = { x: 700, y: 900, w: 100, h: 50 };
   
   bg = new WhiteBg()
-  popup = new Popup(200, 200, 200, 40, CENTER)
+  popup = new Popup(250, 700, 200, 40, CENTER)
 }
 
 function draw() {
@@ -80,7 +81,9 @@ function draw() {
     obj.y < block.y + block.h
   ) {
     spawnBall(); // Respawn!
-    popup.toggle()
+    if (isVisible) {
+      popup.toggle()
+    }
   }
   
   if (
@@ -90,7 +93,9 @@ function draw() {
     obj.y < block2.y + block2.h
   ) {
     spawnBall(); // Respawn!
-    popup.toggle()
+    if (isVisible) {
+      popup.toggle()
+    }
   }
 
   // Draw object
@@ -113,7 +118,16 @@ function mousePressed() {
   if (dist(mouseX, mouseY, obj.x, obj.y) < obj.r) {
     obj.dragging = true;
   }
+  if (popup.toggle() === true) {
+    isVisible = false; // Hide the object
+  }
 }
+
+/*function doubleClicked() {
+  if (popup.toggle(true)) {
+    isVisible = false; // Hide the object
+  }
+}*/
 
 function mouseReleased() {
   obj.dragging = false;
@@ -160,7 +174,7 @@ class Popup extends OnOff {
     stroke(0, t)
     strokeWeight(2)
     rectMode(CENTER)
-    rect(250, (1 - t) * 50, 400, 100, 5)
+    rect(250, (1 - t) * 50, 600, 130, 5)
     textAlign(CENTER)
     text("this is text", 250, (1 - t) * 50)
     drawContent?.(t)
