@@ -1,12 +1,25 @@
 let isVisible = true;
 let obj;
 let block;
+let block2;
+let binLine;
+let binLine2;
+let boardWalk;
 let gravity = 0.1;
+let img;
+let theSun;
+let sunStuff;
+let sunStuff2;
+
+function preload() {
+  img = loadImage('images/crumpled-brown-paper-ball-texture-form_632498-24900.avif');
+}
 
 function setup() {
   createCanvas(1000, 1000);
   colorMode(HSL)
   obj = {
+    //image: img,
     x: width / 2,
     y: height / 2,
     r: 50,
@@ -14,24 +27,55 @@ function setup() {
     vy: 0,
     dragging: false
   };
-  block = { x: -1100, y: 948, w: 1500, h: 50 };
-  block2 = { x: 700, y: 900, w: 100, h: 50 };
+  block = { x: -1100, y: 949, w: 1500, h: 51 };
+  //bin
+  block2 = { x: 700, y: 897, w: 100, h: 50 };
+  binLine = { x1: 700, y1: 948, x2: 650, y2: 750};
+  binLine2 = { x1: 800, y1: 948, x2: 850, y2: 750};
+  //boardwalk
+  boardWalk = { x: 400, y: 948, w: 700, h: 55 };
+  //sun
+  theSun = { x: 0, y: 0, r: 400};
+  sunStuff = {x: 150, y: 100, r: 15};
+  sunStuff2 = {x: 30, y: 90, r: 15};
+  sunStuff3 = { x1: 700, y1: 948, x2: 650, y2: 750};
   
   bg = new WhiteBg()
-  popup = new Popup(250, 700, 200, 40, CENTER)
+  popup = new Popup(250, 550, 200, 40, CENTER)
 }
 
 function draw() {
   background('rgb(220,237,243)');
   
+  fill('rgb(255,211,5)')
+  ellipse(theSun.x, theSun.y, theSun.r)
+  fill('black')
+  ellipse(sunStuff.x, sunStuff.y, sunStuff.r)
+  ellipse(sunStuff2.x, sunStuff2.y, sunStuff2.r)
+  stroke('black')
+  line(sunStuff3.x, sunStuff3.y, sunStuff3.x2, sunStuff3.y2);
+  
+  noStroke()
   bg.draw()
   popup.draw()
+  //water
   fill('rgb(152,203,220)');
   rect(block.x, block.y, block.w, block.h);
   
+  fill('rgb(158,97,13)')
+  rect(boardWalk.x, boardWalk.y, boardWalk.w, boardWalk.h)
+  
+  //bin
   fill('grey');
   rect(block2.x, block2.y, block2.w, block2.h);
+  stroke('grey');
+  strokeWeight(5);
+  line(binLine.x1, binLine.y1, binLine.x2, binLine.y2);
+  line(binLine2.x1, binLine2.y1, binLine2.x2, binLine2.y2);
+  
 
+  //ball
+  noStroke()
   fill('red');
   // Interaction logic
   if (obj.dragging) {
@@ -74,7 +118,7 @@ function draw() {
     }
   }
   
-  if (
+  if ( //water collision
     obj.x > block.x &&
     obj.x < block.x + block.w &&
     obj.y > block.y &&
@@ -86,7 +130,7 @@ function draw() {
     }
   }
   
-  if (
+  if ( //bin collision
     obj.x > block2.x &&
     obj.x < block2.x + block2.w &&
     obj.y > block2.y &&
@@ -97,12 +141,23 @@ function draw() {
       popup.toggle()
     }
   }
+  
+  if ( //boardwalk collision
+    obj.x - obj.r > boardWalk.x &&
+    obj.x - obj.r < boardWalk.x + boardWalk.w &&
+    obj.y + obj.r > boardWalk.y &&
+    obj.y + obj.r < boardWalk.y + boardWalk.h
+  ) {
+      obj.y = boardWalk.y - obj.r;
+      obj.vy *= -0.7; // Bounce
+      obj.vx *= 1; // Friction
+  }
 
   // Draw object
   ellipse(obj.x, obj.y, obj.r * 2);
 }
 
-function spawnBall() {
+function spawnBall() { //the function to respawn the ball when it collides with the water or the bin
   obj = {
     x: width / 2,
     y: height / 2,
