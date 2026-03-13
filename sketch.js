@@ -1,3 +1,6 @@
+let data;
+let cleanedData = [];
+
 let isVisible = true;
 let obj;
 let block;
@@ -12,6 +15,7 @@ let sunStuff;
 let sunStuff2;
 
 function preload() {
+  data = loadTable("data/fact_data.csv", "csv", "header");
   img = loadImage('images/crumpled-brown-paper-ball-texture-form_632498-24900.avif');
 }
 
@@ -27,21 +31,28 @@ function setup() {
     vy: 0,
     dragging: false
   };
-  block = { x: -1100, y: 949, w: 1500, h: 51 };
+  //water
+  block = { x: -1100, y: 949, w: 1500, h: 51};
   //bin
-  block2 = { x: 700, y: 897, w: 100, h: 50 };
+  block2 = { x: 700, y: 897, w: 100, h: 50};
   binLine = { x1: 700, y1: 948, x2: 650, y2: 750};
   binLine2 = { x1: 800, y1: 948, x2: 850, y2: 750};
+  binLid = { x1: 845, y1: 750, x2: 890, y2: 600};
   //boardwalk
-  boardWalk = { x: 400, y: 948, w: 700, h: 55 };
+  boardWalk = { x: 400, y: 948, w: 700, h: 55};
   //sun
   theSun = { x: 0, y: 0, r: 400};
   sunStuff = {x: 150, y: 100, r: 15};
   sunStuff2 = {x: 30, y: 90, r: 15};
-  sunStuff3 = { x1: 700, y1: 948, x2: 650, y2: 750};
+  sunStuff3 = { x1: 70, y1: 140, x2: 120, y2: 140};
+  sunStuff4 = { x1: 30, y1: 120, x2: 70, y2: 140};
   
   bg = new WhiteBg()
   popup = new Popup(250, 550, 200, 40, CENTER)
+  
+  for(let i=0; i<data.rows.length; i++){
+		cleanedData.push(data.rows[i].obj)
+	}
 }
 
 function draw() {
@@ -53,7 +64,8 @@ function draw() {
   ellipse(sunStuff.x, sunStuff.y, sunStuff.r)
   ellipse(sunStuff2.x, sunStuff2.y, sunStuff2.r)
   stroke('black')
-  line(sunStuff3.x, sunStuff3.y, sunStuff3.x2, sunStuff3.y2);
+  line(sunStuff3.x1, sunStuff3.y1, sunStuff3.x2, sunStuff3.y2);
+  line(sunStuff4.x1, sunStuff4.y1, sunStuff4.x2, sunStuff4.y2);
   
   noStroke()
   bg.draw()
@@ -62,16 +74,22 @@ function draw() {
   fill('rgb(152,203,220)');
   rect(block.x, block.y, block.w, block.h);
   
+  //boardwalk
   fill('rgb(158,97,13)')
   rect(boardWalk.x, boardWalk.y, boardWalk.w, boardWalk.h)
   
   //bin
   fill('grey');
   rect(block2.x, block2.y, block2.w, block2.h);
-  stroke('grey');
+  beginShape()
+  vertex(binLine.x1, binLine.y1);
+  vertex(binLine.x2, binLine.y2);
+  vertex(binLine2.x2, binLine2.y2);
+  vertex(binLine2.x1, binLine2.y1);
+  endShape()
   strokeWeight(5);
-  line(binLine.x1, binLine.y1, binLine.x2, binLine.y2);
-  line(binLine2.x1, binLine2.y1, binLine2.x2, binLine2.y2);
+  stroke('grey')
+  line(binLid.x1, binLid.y1, binLid.x2, binLid.y2)
   
 
   //ball
@@ -153,7 +171,7 @@ function draw() {
       obj.vx *= 1; // Friction
   }
 
-  // Draw object
+  // Draw ball
   ellipse(obj.x, obj.y, obj.r * 2);
 }
 
@@ -231,7 +249,8 @@ class Popup extends OnOff {
     rectMode(CENTER)
     rect(250, (1 - t) * 50, 600, 130, 5)
     textAlign(CENTER)
-    text("this is text", 250, (1 - t) * 50)
+    //let labels = data.map((x) => x.FactText);
+    text(cleanedData[0].FactText, 250, (1 - t) * 50)
     drawContent?.(t)
     pop()
   }
@@ -258,3 +277,12 @@ function ease(_p, g=1.75, neg=false) {
     : 1 - 0.5 * pow(2*(1 - p), g);
   return neg ? res * 2 - 1 : res
 }
+
+/*function cleanData() {
+  for (let i = 0; i < data.rows.length; i++) {
+   cleanedData.push({...data.rows[i].obj,
+    FactText:+data.rows[i].obj.FactText,
+    FactNum:+data.rows[i].obj.FactNum
+    });
+  }
+}*/
