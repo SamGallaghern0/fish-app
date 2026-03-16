@@ -1,7 +1,8 @@
 let data;
 let cleanedData = [];
 
-let isVisible = true;
+let on = false;
+
 let obj;
 let block;
 let block2;
@@ -16,12 +17,11 @@ let sunStuff2;
 
 function preload() {
   data = loadTable("data/fact_data.csv", "csv", "header");
-  img = loadImage('images/crumpled-brown-paper-ball-texture-form_632498-24900.avif');
+  //img = loadImage('images/crumpled-brown-paper-ball-texture-form_632498-24900.avif');
 }
 
 function setup() {
   createCanvas(1000, 1000);
-  colorMode(HSL)
   obj = {
     //image: img,
     x: width / 2,
@@ -47,8 +47,6 @@ function setup() {
   sunStuff3 = { x1: 70, y1: 140, x2: 120, y2: 140};
   sunStuff4 = { x1: 30, y1: 120, x2: 70, y2: 140};
   
-  bg = new WhiteBg()
-  popup = new Popup(250, 550, 200, 40, CENTER)
   
   for(let i=0; i<data.rows.length; i++){
 		cleanedData.push(data.rows[i].obj)
@@ -57,6 +55,13 @@ function setup() {
 
 function draw() {
   background('rgb(220,237,243)');
+  
+  let square = {
+    x: width / 4,
+    y: height / 2,
+    w: width / 2,
+    h: 200,
+  }
   
   fill('rgb(255,211,5)')
   ellipse(theSun.x, theSun.y, theSun.r)
@@ -68,8 +73,6 @@ function draw() {
   line(sunStuff4.x1, sunStuff4.y1, sunStuff4.x2, sunStuff4.y2);
   
   noStroke()
-  bg.draw()
-  popup.draw()
   //water
   fill('rgb(152,203,220)');
   rect(block.x, block.y, block.w, block.h);
@@ -90,6 +93,12 @@ function draw() {
   strokeWeight(5);
   stroke('grey')
   line(binLid.x1, binLid.y1, binLid.x2, binLid.y2)
+  
+  if (on) {
+    noStroke();
+    fill('rgb(246,240,240)');
+    rect(square.x, square.y, square.w, square.h);
+  }
   
 
   //ball
@@ -143,9 +152,7 @@ function draw() {
     obj.y < block.y + block.h
   ) {
     spawnBall(); // Respawn!
-    if (isVisible) {
-      popup.toggle()
-    }
+    on = !on
   }
   
   if ( //bin collision
@@ -155,9 +162,7 @@ function draw() {
     obj.y < block2.y + block2.h
   ) {
     spawnBall(); // Respawn!
-    if (isVisible) {
-      popup.toggle()
-    }
+    on = !on
   }
   
   if ( //boardwalk collision
@@ -191,98 +196,9 @@ function mousePressed() {
   if (dist(mouseX, mouseY, obj.x, obj.y) < obj.r) {
     obj.dragging = true;
   }
-  if (popup.toggle() === true) {
-    isVisible = false; // Hide the object
-  }
+  on = false;
 }
-
-/*function doubleClicked() {
-  if (popup.toggle(true)) {
-    isVisible = false; // Hide the object
-  }
-}*/
 
 function mouseReleased() {
   obj.dragging = false;
 }
-
-
-//code taken from Popup by kangabru
-class OnOff {
-  constructor() {
-    this.on = false
-    this._val = 0
-  }
-  
-  get val() { return ease(this._val / 100, 3) }
-  
-  updateOnOff() {
-    const tar = this.on ? 100 : 0
-    this._val += constrain(tar - this._val, -4, 4)
-  }
-}
-
-class Popup extends OnOff {
-  constructor(x, y, w, h, mode) {
-    super()
-    this.x = x
-    this.y = y
-    this.w = w
-    this.h = h
-    this.mode = mode
-  }
-  
-  toggle() {
-    this.on = !this.on
-    bg.on = this.on
-  }
-  
-  draw(drawContent) {
-    this.updateOnOff()
-    const t = this.val
-    push()
-    rectMode(this.mode)
-    translate(this.x, this.y)
-    fill(100, t)
-    stroke(0, t)
-    strokeWeight(2)
-    rectMode(CENTER)
-    rect(250, (1 - t) * 50, 600, 130, 5)
-    textAlign(CENTER)
-    //let labels = data.map((x) => x.FactText);
-    text(cleanedData[0].FactText, 250, (1 - t) * 50)
-    drawContent?.(t)
-    pop()
-  }
-}
-
-class WhiteBg extends OnOff {
-  constructor() {
-    super()
-  }
-  
-  draw() {
-    this.updateOnOff()
-    fill(100, this.val * 0.4)
-    noStroke()
-    rectMode(CORNER)
-    rect(0, 0, width, height)
-  }
-}
-
-function ease(_p, g=1.75, neg=false) {
-  let p = 1 - abs(1 - _p % 2) // make continuous between 0-1
-  let res = p < 0.5
-    ? 0.5 * pow(2*p, g)
-    : 1 - 0.5 * pow(2*(1 - p), g);
-  return neg ? res * 2 - 1 : res
-}
-
-/*function cleanData() {
-  for (let i = 0; i < data.rows.length; i++) {
-   cleanedData.push({...data.rows[i].obj,
-    FactText:+data.rows[i].obj.FactText,
-    FactNum:+data.rows[i].obj.FactNum
-    });
-  }
-}*/
