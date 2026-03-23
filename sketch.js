@@ -17,7 +17,9 @@ let sunStuff2;
 
 function preload() {
   data = loadTable("data/fact_data.csv", "csv", "header");
-  //img = loadImage('images/crumpled-brown-paper-ball-texture-form_632498-24900.avif');
+  img = loadImage('images/crumpled-brown-paper-ball-texture-form_632498-24900.avif');
+  water = loadImage('assets/water.png');
+  wood = loadImage('assets/wood floor.png');
 }
 
 function setup() {
@@ -63,6 +65,7 @@ function draw() {
     h: 200,
   }
   
+  strokeWeight(5);
   fill('rgb(255,211,5)')
   ellipse(theSun.x, theSun.y, theSun.r)
   fill('black')
@@ -75,11 +78,11 @@ function draw() {
   noStroke()
   //water
   fill('rgb(152,203,220)');
-  rect(block.x, block.y, block.w, block.h);
+  image(water, block.x, block.y, block.w, block.h);
   
   //boardwalk
   fill('rgb(158,97,13)')
-  rect(boardWalk.x, boardWalk.y, boardWalk.w, boardWalk.h)
+  image(wood, boardWalk.x, boardWalk.y, boardWalk.w, boardWalk.h)
   
   //bin
   fill('grey');
@@ -98,6 +101,11 @@ function draw() {
     noStroke();
     fill('rgb(246,240,240)');
     rect(square.x, square.y, square.w, square.h);
+    textAlign(CENTER)
+    strokeWeight(1);
+    stroke('black')
+    noFill()
+    text(cleanedData[0].FactText, square.x + (square.w / 2), square.y + (square.h / 2));
   }
   
 
