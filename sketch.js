@@ -3,6 +3,8 @@ let cleanedData = [];
 
 let on = false;
 
+let infoCount = 0;
+
 let obj;
 let block;
 let block2;
@@ -105,9 +107,9 @@ function draw() {
     strokeWeight(1);
     stroke('black')
     noFill()
-    text(cleanedData[0].FactText, square.x + (square.w / 2), square.y + (square.h / 2));
+    text(cleanedData[infoCount].FactText, square.x + (square.w / 2), square.y + (square.h / 2));
+    //console.log(infoCount)
   }
-  
 
   //ball
   noStroke()
@@ -197,6 +199,10 @@ function spawnBall() { //the function to respawn the ball when it collides with 
     vy: 0,
     dragging: false
   };
+  infoCount++
+  if (infoCount > cleanedData.length - 1){
+    infoCount = 0;
+  }
 }
 
 function mousePressed() {
